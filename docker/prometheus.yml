@@ -1,0 +1,54 @@
+# Prometheus配置文件
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 档案管理系统后端监控
+  - job_name: 'archives-backend'
+    static_configs:
+      - targets: ['archives-backend:8080']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+
+  # PostgreSQL数据库监控
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['archives-postgres:5432']
+
+  # Redis监控
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['archives-redis:6379']
+
+  # Elasticsearch监控
+  - job_name: 'elasticsearch'
+    static_configs:
+      - targets: ['archives-elasticsearch:9200']
+    metrics_path: '/_prometheus/metrics'
+
+  # MinIO监控
+  - job_name: 'minio'
+    static_configs:
+      - targets: ['archives-minio:9000']
+    metrics_path: '/minio/v2/metrics/cluster'
+
+  # Nginx监控 (需要配置nginx-prometheus-exporter)
+  # - job_name: 'nginx'
+  #   static_configs:
+  #     - targets: ['nginx-exporter:9113']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
